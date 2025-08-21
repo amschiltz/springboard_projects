@@ -216,3 +216,27 @@ Icon
 
 # Thumbnails
 ._*
+
+# Office docs (working drafts) and PDFs
+*.docx
+*.pptx
+*.xlsx
+*.pdf
+
+# Design source files (huge and binary)
+*.psd
+*.ai
+
+# Archives
+*.zip
+*.tar
+*.gz
+*.7z
+*.iso
+*.dmg
+
+# Compiled binaries
+*.exe
+*.dll
+*.bin
+*.dat
