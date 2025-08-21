@@ -205,3 +205,14 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Apple Ignore
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must be 32x32px
+Icon
+
+# Thumbnails
+._*
