@@ -217,11 +217,13 @@ Icon
 # Thumbnails
 ._*
 
-# Office docs (working drafts) and PDFs
+# Reports and Office docs
 *.docx
 *.pptx
 *.xlsx
 *.pdf
+*.html   # auto-generated reports (e.g., ydata-profiling)
+
 
 # Design source files (huge and binary)
 *.psd

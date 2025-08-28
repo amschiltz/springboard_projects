@@ -1,0 +1,22 @@
+column_name,role,notes
+customerID,id,Unique customer identifier
+Churn,target,Binary target: Yes/No
+tenure,numeric,Customer tenure in months
+MonthlyCharges,numeric,Monthly bill amount
+TotalCharges,numeric,Total bill-to-date
+gender,categorical,Self-reported gender
+SeniorCitizen,boolean,"0=No, 1=Yes"
+Partner,categorical,Marital/partner status
+Dependents,categorical,Has dependents?
+PhoneService,categorical,Has phone service?
+MultipleLines,categorical,Multiple lines indicator
+InternetService,categorical,DSL/Fiber/None
+OnlineSecurity,categorical,Internet add-on service
+OnlineBackup,categorical,Internet add-on service
+DeviceProtection,categorical,Internet add-on service
+TechSupport,categorical,Customer support service
+StreamingTV,categorical,Streaming TV service
+StreamingMovies,categorical,Streaming movie service
+Contract,categorical,Contract type (Month-to-month/1yr/2yr)
+PaperlessBilling,boolean,Paperless billing indicator
+PaymentMethod,categorical,Payment method category

@@ -1,0 +1,95 @@
+# 📊 Capstone 2 — Telco Customer Churn Prediction
+
+## 1. Executive Summary
+This project develops a predictive model to identify telecom customers most likely to churn (leave the company).  
+By predicting churn, the business can take proactive retention steps, reducing customer loss and improving revenue stability.  
+
+**Goals:**  
+- Build models with **recall ≥ 0.70** and **ROC-AUC > 0.75**  
+- Provide interpretable insights into factors driving churn  
+- Deliver notebooks, reports, and a stakeholder-friendly presentation  
+
+---
+
+## 2. Repository Structure
+Capstone_2/
+├─ data/
+│ ├─ raw/ # immutable source files (e.g., Kaggle CSV)
+│ ├─ interim/ # temporary outputs (e.g., flagged rows, test subsets)
+│ └─ processed/ # clean, analysis-ready datasets
+│
+├─ notebooks/
+│ ├─ 01_data_wrangling.ipynb # cleaning, missing values, dtype fixes
+│ ├─ 02_eda.ipynb # exploratory data analysis
+│ ├─ 03_modeling.ipynb # modeling & evaluation
+│ └─ experiments/ # scratch notebooks & auto-generated outputs
+│ ├─ ydata_test.ipynb
+│ └─ test_report.html
+│
+├─ reports/
+│ ├─ figures/ # plots & charts for reports
+│ ├─ eda_summary_template.md # structured EDA summary
+│ ├─ final_report_template.md # structured final report
+│ └─ slides/
+│ └─ telco_churn_presentation_outline.pptx
+│
+├─ references/ # supporting documentation & metadata
+│ ├─ telco_column_role_manifest_template.csv
+│ ├─ capstone_two_proposal.docx
+│ ├─ rubric_capstone_2_project_proposal.pdf
+│ └─ capstone_2_step_1_proposal_instructions.docx
+│
+├─ src/ # reusable helper functions (optional)
+│ ├─ init.py
+│ ├─ data_prep.py
+│ ├─ eda_utils.py
+│ └─ modeling.py
+│
+├─ deliverables/ # FINAL polished versions for submission
+│ ├─ Capstone2_Final_Notebook.ipynb
+│ ├─ Capstone2_Final_Report.pdf
+│ └─ Capstone2_Presentation.pdf
+│
+├─ README.md
+└─ requirements.txt
+
+
+---
+
+## 3. Workflow
+
+1. **Data Wrangling**  
+   - Notebook: `01_data_wrangling.ipynb`  
+   - Clean dataset, handle missing values, fix dtypes  
+   - Save processed version to `data/processed/`  
+
+2. **Exploratory Data Analysis (EDA)**  
+   - Notebook: `02_eda.ipynb`  
+   - Explore churn distribution, visualize key drivers  
+   - Summarize findings in `reports/eda_summary_template.md`  
+
+3. **Modeling & Evaluation**  
+   - Notebook: `03_modeling.ipynb`  
+   - Baseline (logistic regression) → Advanced (gradient boosting)  
+   - Evaluate with recall, precision, ROC-AUC, PR-AUC  
+   - Save plots in `reports/figures/`  
+
+4. **Experiments / Sandbox**  
+   - Use `notebooks/experiments/` for scratch work (e.g., profiling)  
+   - Auto-generated outputs (e.g., `test_report.html`) stay here  
+   - May be excluded from version control if large  
+
+5. **Reporting & Deliverables**  
+   - Fill in `reports/final_report_template.md`  
+   - Update presentation in `reports/slides/`  
+   - Place final polished files in `deliverables/`  
+
+---
+
+## 4. Environment Setup
+1. Clone repo and navigate to `Capstone_2/`  
+2. Create virtual environment:  
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate   # macOS/Linux
+   .venv\Scripts\activate      # Windows
