@@ -38,7 +38,7 @@ SELECT
     name, 
     membercost 
 FROM Facilities 
-WHERE membercost > 0
+WHERE membercost > 0;
 
 
 /* Q2: How many facilities do not charge a fee to members? */
@@ -47,7 +47,7 @@ SELECT
     name, 
     membercost 
 FROM Facilities
-WHERE membercost = 0
+WHERE membercost = 0;
 
 /* Q3: Write an SQL query to show a list of facilities that charge a fee to members,
 where the fee is less than 20% of the facility's monthly maintenance cost.
@@ -61,14 +61,14 @@ SELECT
     monthlymaintenance 
 FROM Facilities 
 WHERE membercost > 0 
-    AND (membercost / monthlymaintenance < .2)
+    AND (membercost / monthlymaintenance < .2);
 
 /* Q4: Write an SQL query to retrieve the details of facilities with ID 1 and 5.
 Try writing the query without using the OR operator. */
 
 SELECT * 
 FROM Facilities 
-WHERE facid IN (1, 5)
+WHERE facid IN (1, 5);
 
 /* Q5: Produce a list of facilities, with each labelled as
 'cheap' or 'expensive', depending on if their monthly maintenance cost is
@@ -79,7 +79,7 @@ SELECT name,
         monthlymaintenance,
         CASE WHEN monthlymaintenance > 100 THEN 'Expensive'
             ELSE 'cheap' END AS cost_status
-FROM Facilities
+FROM Facilities;
 
 /* Q6: You'd like to get the first and last name of the last member(s)
 who signed up. Try not to use the LIMIT clause for your solution. */
@@ -89,7 +89,7 @@ SELECT
     surname,
     joindate
 FROM Members
-WHERE joindate = (SELECT MAX(joindate) FROM Members)
+WHERE joindate = (SELECT MAX(joindate) FROM Members);
 
 /* Q7: Produce a list of all members who have used a tennis court.
 Include in your output the name of the court, and the name of the member
@@ -103,7 +103,7 @@ FROM Members
 INNER JOIN Bookings USING(memid)
 INNER JOIN Facilities USING(facid)
 WHERE Facilities.name LIKE 'Tennis Court%'
-ORDER BY member_name, facility_name
+ORDER BY member_name, facility_name;
 
 /* Q8: Produce a list of bookings on the day of 2012-09-14 which
 will cost the member (or guest) more than $30. Remember that guests have
@@ -132,7 +132,7 @@ WHERE starttime >= '2012-09-14 00:00:00'
         ELSE Facilities.membercost * Bookings.slots 
     END
     ) > 30
-ORDER BY cost DESC
+ORDER BY cost DESC;
 
 /* Q9: This time, produce the same result as in Q8, but using a subquery. */
 
@@ -155,7 +155,7 @@ FROM (
     AND Bookings.starttime <  '2012-09-15 00:00:00'
 ) AS priced
 WHERE cost > 30
-ORDER BY cost DESC
+ORDER BY cost DESC;
 
 /* PART 2: SQLite
 /* We now want you to jump over to a local instance of the database on your machine. 
@@ -190,7 +190,7 @@ JOIN Members ON Bookings.memid = Members.memid
 JOIN Facilities ON Bookings.facid = Facilities.facid
 GROUP BY facility_name
 HAVING total_revenue < 1000
-ORDER BY total_revenue DESC
+ORDER BY total_revenue DESC;
 
 /* Q11: Produce a report of members and who recommended them in alphabetic surname,firstname order */
 
@@ -205,7 +205,7 @@ LEFT JOIN Members r
     ON CAST(m.recommendedby AS INTEGER) = r.memid
 WHERE m.recommendedby IS NOT NULL 
     AND m.recommendedby != ''
-ORDER BY m.surname, m.firstname
+ORDER BY m.surname, m.firstname;
 
 /* Q12: Find the facilities with their usage by member, but not guests */
 
@@ -218,7 +218,7 @@ JOIN Facilities USING(facid)
 JOIN Members USING(memid)
 WHERE memid != 0
 GROUP BY Facilities.name, memid
-ORDER BY Facilities.name, member_name
+ORDER BY Facilities.name, member_name;
 
 /* Q13: Find the facilities usage by month, but not guests */
 
@@ -231,4 +231,4 @@ JOIN Facilities USING(facid)
 JOIN Members USING(memid)
 WHERE memid != 0
 GROUP BY Facilities.name, month
-ORDER BY Facilities.name, month
+ORDER BY Facilities.name, month;
