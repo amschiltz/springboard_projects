@@ -20,3 +20,8 @@ StreamingMovies,categorical,Streaming movie service
 Contract,categorical,Contract type (Month-to-month/1yr/2yr)
 PaperlessBilling,boolean,Paperless billing indicator
 PaymentMethod,categorical,Payment method category
+tenure_group_eng,categorical,Engineered: Tenure binned into groups (0-6/7-12/13-24/25-48/49+)
+total_services_eng,numeric,Engineered: Count of subscribed services per customer
+monthly_charges_bin_eng,categorical,Engineered: Monthly charges binned (Low/Medium/High)
+is_month_to_month_eng,categorical,Engineered: Binary indicator for month-to-month contract
+short_tenure_month_to_month_eng,categorical,Engineered: Short tenure + month-to-month interaction
