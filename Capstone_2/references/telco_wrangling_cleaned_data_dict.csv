@@ -46,3 +46,5 @@ is_month_to_month_eng,category,2,0,"['Yes', 'No']
 Categories (2, object): ['No', 'Yes']"
 short_tenure_month_to_month_eng,category,2,0,"[True, False]
 Categories (2, bool): [False, True]"
+has_streaming_eng,category,2,0,"['No', 'Yes']
+Categories (2, object): ['No', 'Yes']"
