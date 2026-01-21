@@ -1,0 +1,39 @@
+column_name,role,notes,readable_label
+customerID,id,Unique customer identifier,Customer ID
+Churn,target,Binary target: Yes/No,Churn
+tenure,numeric,Customer tenure in months,Tenure (months)
+MonthlyCharges,numeric,Monthly bill amount,Monthly Charges
+TotalCharges,numeric,Total bill-to-date,Total Charges
+gender,categorical,Self-reported gender,Gender
+SeniorCitizen,categorical,"0=No, 1=Yes",Senior Citizen
+Partner,categorical,Marital/partner status,Partner
+Dependents,categorical,Has dependents?,Dependents
+PhoneService_Yes,categorical,Has phone service?,Phone Service
+MultipleLines,categorical,Multiple lines indicator,Multiple Lines
+InternetService,categorical,DSL/Fiber/None,Internet Service
+OnlineSecurity,categorical,Internet add-on service,Online Security
+OnlineBackup,categorical,Internet add-on service,Online Backup
+DeviceProtection,categorical,Internet add-on service,Device Protection
+TechSupport,categorical,Customer support service,Tech Support
+StreamingTV,categorical,Streaming TV service,Streaming TV
+StreamingMovies,categorical,Streaming movie service,Streaming Movies
+Contract,categorical,Contract type (Month-to-month/1yr/2yr),Contract Type
+PaperlessBilling,categorical,Paperless billing indicator,Paperless Billing
+PaymentMethod,categorical,Payment method category,Payment Method
+tenure_group_eng_7-12, categorical,Engineered: Tenure binned into groups (0-6/7-12/13-24/25-48/49+),Tenure Group (7-12 months)
+short_tenure_month_to_month_eng_True,categorical,Engineered: Short tenure + month-to-month interaction,Short Tenure & Month-to-Month (True)
+InternetService_Fiber_optic,categorical,DSL/Fiber/None,Internet Service (Fiber Optic)
+InternetService_DSL,categorical,DSL/Fiber/None,Internet Service (DSL)
+tenure_group_eng,categorical,Engineered: Tenure binned into groups (0-6/7-12/13-24/25-48/49+),Tenure Group (Engineered)
+total_services_eng,numeric,Engineered: Count of subscribed services per customer,Total Services (Engineered)
+monthly_charges_bin_eng,categorical,Engineered: Monthly charges binned (Low/Medium/High),Monthly Charges Bin (Engineered)
+is_month_to_month_eng,categorical,Engineered: Binary indicator for month-to-month contract,Month-to-Month (Engineered)
+short_tenure_month_to_month_eng,categorical,Engineered: Short tenure + month-to-month interaction,Short Tenure & Month-to-Month (Engineered)
+has_streaming_eng,categorical,Engineered: Binary indicator for having streaming service,Has Streaming (Engineered)
+OnlineSecurity_Yes,categorical,Internet add-on service,Online Security (Yes)
+OnlineBackup_Yes,categorical,Internet add-on service,Online Backup (Yes)
+DeviceProtection_Yes,categorical,Internet add-on service,Device Protection (Yes)
+TechSupport_Yes,categorical,Customer support service,Tech Support (Yes)
+StreamingTV_Yes,categorical,Streaming TV service,Streaming TV (Yes)
+StreamingMovies_Yes,categorical,Streaming movie service,Streaming Movies (Yes)
+is_month_to_month_eng_Yes,categorical,Engineered: Binary indicator for month-to-month contract,Month-to-Month (Yes)
