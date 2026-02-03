@@ -1,0 +1,9 @@
+Model,Recall,Precision,ROC-AUC
+Logistic Regression: All Features,0.802,0.5262,0.8479
+Logistic Regression: Monthly Charges,0.8,0.5163,0.8339
+Logistic Regression: Internet Service,0.804,0.5227,0.8445
+Logistic Regression: All Add-Ons,0.8094,0.529,0.8469
+LightGBM: All Features,0.7973,0.5263,0.8428
+LightGBM: Monthly Charges,0.8181,0.497,0.8356
+LightGBM: Internet Service,0.8013,0.5117,0.8402
+LightGBM: All Add-Ons,0.8054,0.5195,0.8431

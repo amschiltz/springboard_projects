@@ -1,0 +1,5 @@
+Metric,Validation Set,Test Set
+True Neg (TN),73.9,70.18
+False Pos (FP),26.1,29.82
+False Neg (FN),18.26,20.32
+True Pos (TP),81.74,79.68

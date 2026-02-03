@@ -1,0 +1,4 @@
+Metric,Validation Set,Test Set
+Recall,0.8094,0.797
+Precision,0.529,0.492
+ROC-AUC,0.8469,0.835
