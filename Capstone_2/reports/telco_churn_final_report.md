@@ -1,55 +1,96 @@
 # Final Report — Telco Customer Churn Prediction
 
 ## 1. Introduction
+
 ### Problem Statement
 Customer churn reduces revenue and increases acquisition costs. This project builds a reproducible, interpretable predictive model to identify customers most at risk of churning so that retention efforts can be prioritized where they have the greatest impact.
 
 ### Success Criteria
-The primary objectives are to identify at least 70% of actual churners (recall ≥ 0.7) while maintaining precision ≥ 0.5. We also track ROC-AUC to assess overall discriminative performance. Threshold selection centers on recall, with a 0.5 probability cutoff used for evaluation to meet business goals.
+The primary objectives are to identify at least 70% of actual churners (recall ≥ 0.7) while maintaining precision ≥ 0.5. I also track ROC-AUC to assess overall discriminative performance. Threshold selection centers on recall, with a 0.5 probability cutoff used for evaluation to meet business goals.
 
 ### Stakeholders
 Executive leadership, customer service/retention operations, and marketing rely on churn insights to guide decisions, allocate resources, and design targeted interventions. Analytics and finance teams use model outputs to forecast risk and quantify ROI of retention programs.
 
 ### Approach
-We begin with a baseline majority-class benchmark, then implement logistic regression for interpretability, followed by advanced models to enhance performance. Class imbalance is addressed using model class weights; evaluation focuses on recall and ROC-AUC. All work is executed in modular, reproducible Jupyter notebooks, using only features defined in the project’s column manifest, with outputs and figures saved for transparency.
+I begin with a baseline majority-class benchmark, then implement logistic regression for interpretability, followed by advanced models to enhance performance. Class imbalance is addressed using model class weights; evaluation focuses on recall and ROC-AUC. All work is executed in modular, reproducible Jupyter notebooks, using only features defined in the project’s column manifest, with outputs and figures saved for transparency.
 
 Data source: the analysis uses the Telco Customer Churn dataset (Kaggle). 
 
 Limitations: optimizing for recall at a 0.5 probability threshold lowers precision; class imbalance is handled via class weights rather than sampling.
 
-**Key Results**
-To meet business objectives, a 0.5 probability threshold was selected. The final model achieved recall 0.81, precision 0.53, and ROC-AUC 0.77 — surpassing the recall target and meeting the precision benchmark. 
+### Key Results
+
+To meet business objectives, a 0.5 probability threshold was selected. The final model achieved recall 0.81, precision 0.53, and ROC-AUC 0.77, surpassing the recall target and meeting the precision benchmark. 
 
 Retention signals include longer contracts (1-year, 2-year), higher tenure (7–12, 13–24, 25–48, 48+ months), and the Online Security add-on. 
 
 Churn signals include fiber optic internet service, electronic payment method, and multiple phone lines.
 
-**Recommendations** 
-We recommend incentives for longer contracts, reliability improvements for fiber customers, tailored bundles for multi-line accounts, and targeted offers for electronic payment users
+### Recommendations
+
+I recommend incentives for longer contracts, reliability improvements for fiber customers, tailored bundles for multi-line accounts, and targeted offers for electronic payment users.
+
 ---
 
 ## 2. Data Description
 
-- Source and shape: Telco Customer Churn (Kaggle); 7,043 customers and 21 features.
+This analysis uses the **Telco Customer Churn** dataset from Kaggle, which contains **7,043 customer records and 21 original features**. Each record represents a single customer account.
 
-- Feature groups: Demographics (gender, SeniorCitizen, Partner, Dependents); Account & Contract (tenure, Contract, PaperlessBilling, PaymentMethod); Services (PhoneService/MultipleLines, InternetService, add-ons: OnlineSecurity, OnlineBackup, DeviceProtection, TechSupport, StreamingTV, StreamingMovies); Billing (MonthlyCharges, TotalCharges).
+The features can be grouped into four primary domains:
 
-- Roles and target: Numeric (tenure, MonthlyCharges, TotalCharges); Categorical (all others); Target: Churn (Yes/No).
+- **Demographics:** gender, `SeniorCitizen`, `Partner`, `Dependents`
+- **Account and contract characteristics:** tenure, `Contract`, `PaperlessBilling`, `PaymentMethod`
+- **Services:** `PhoneService`, `MultipleLines`, `InternetService`, and related add-on services (`OnlineSecurity`, `OnlineBackup`, `DeviceProtection`, `TechSupport`, `StreamingTV`, `StreamingMovies`)
+- **Billing information:** `MonthlyCharges` and `TotalCharges`
 
-- References: Column roles/types governed by the manifest [references/telco_column_role_manifest.csv](references/telco_column_role_manifest.csv); full dictionaries in [references/telco_raw_data_dictionary.csv](references/telco_raw_data_dictionary.csv) and [references/telco_wrangling_cleaned_data_dict.csv](references/telco_wrangling_cleaned_data_dict.csv).
+The target variable is **Churn**, a binary indicator (Yes/No) identifying customers who discontinued service during the prior month. Numeric features include tenure, `MonthlyCharges`, and `TotalCharges`; all remaining variables are categorical.
 
-- Scope notes: The dataset lacks explicit temporal context beyond account tenure. The target distribution is imbalanced and addressed via model class weights (see Methods). Detailed cleaning and engineered features (e.g., type conversions and *_eng) are documented in Data Wrangling; only manifest-defined columns are used for modeling.
+The dataset contains no explicit date fields. Account tenure serves as the sole temporal indicator, limiting the analysis to a cross-sectional view rather than a time-series framework. The target variable is moderately imbalanced, with an overall churn rate of **26.6%**, which informed subsequent evaluation metric selection.
+
+Column roles and data types are governed by a predefined manifest (telco_column_role_manifest.csv). Detailed variable definitions are provided in the raw (telco_raw_data_dictionary.csv) and cleaned (telco_wrangling_cleaned_data_dict.csv) data dictionaries for transparency and reproducibility.
 
 ---
 
 ## 4. Methods
-### 4.1 Data Wrangling
-- Key cleaning steps (missing values, type conversions, categorical standardization)
-- Any assumptions made
-- Final dataset size and features retained
+
+### 4.1 Data Wrangling 
+
+Initial data audits were conducted to assess structure, completeness, and consistency across all variables. This included review of summary statistics, missingness patterns, categorical value domains, and duplicate records.
+
+No constant columns or duplicate rows were identified.
+
+Data types were standardized by converting `TotalCharges` to numeric (coercing invalid values to NaN) and casting all categorical variables to categorical data types. The `SeniorCitizen` indicator was mapped from binary values (0/1) to human-readable labels (Yes/No).
+
+Rows with missing `TotalCharges` values (n = 11) were removed. These observations corresponded to new customers with tenure equal to zero and did not provide meaningful information for churn modeling.
+
+Outlier and consistency checks were performed using interquartile range (IQR) methods for numeric variables, along with validation against business rules (e.g., customers without internet service should not have internet add-ons). No outliers, impossible values, rare categorical levels, or business-rule contradictions were detected, and no category consolidation was required.
+
+To support downstream analysis and modeling, several engineered features were created:
+
+- `tenure_group_eng`: tenure binned into 0–6, 7–12, 13–24, 25–48, and 49+ months
+
+- `total_services_eng`: count of subscribed services
+
+- `monthly_charges_bin_eng`: MonthlyCharges binned into Low, Medium, and High
+
+- `is_month_to_month_eng`: indicator for month-to-month contracts
+
+- `short_tenure_month_to_month_eng`: flag for customers with short tenure on month-to-month contracts
+
+- `has_streaming_eng`: indicator for any streaming service subscription
+
+Exploratory visualizations (histograms and boxplots) were used to verify distributions and confirm the effects of transformations and feature engineering.
+
+All steps were executed with fixed random seeds (SEED = 42) to ensure reproducibility.
+
+The final analytical dataset contains **7,032 customer records and 27 features**, including all 21 original variables and 6 engineered features. The cleaned dataset and accompanying data dictionary were saved for reproducibility and future use.
+
+The cleaned dataset and accompanying data dictionary were saved to support reproducibility and downstream analysis (`telco_wrangling_cleaned.csv` and `telco_wrangling_cleaned_data_dict.csv`).
+
 
 ### 4.2 Exploratory Data Analysis
 - Distribution of churn vs non-churn
+In the exploratory data analysis I found that 
 - Notable trends and relationships
 - Key potential drivers of churn
 
