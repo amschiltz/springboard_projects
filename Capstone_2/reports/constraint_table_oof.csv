@@ -1,0 +1,9 @@
+Model,Meets constraint?,Chosen threshold,Recall@thresh (OOF),Precision@thresh (OOF),ROC-AUC (OOF),PR-AUC/AP (OOF)
+Logistic Regression: All Add-Ons,True,0.4856,0.8167,0.52,0.8463,0.65
+LightGBM: All Features,True,0.5092,0.8154,0.5201,0.8489,0.6621
+Logistic Regression: All Features,True,0.4916,0.8107,0.5202,0.8487,0.6627
+LightGBM: Internet Service,True,0.5201,0.8087,0.52,0.84,0.6304
+Logistic Regression: Monthly Charges,True,0.4948,0.802,0.5202,0.8432,0.639
+LightGBM: All Add-Ons,True,0.5135,0.802,0.5202,0.8434,0.6445
+Logistic Regression: Internet Service,True,0.5063,0.7987,0.52,0.8417,0.6349
+LightGBM: Monthly Charges,True,0.5197,0.7987,0.52,0.8411,0.6333
