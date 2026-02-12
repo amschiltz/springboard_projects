@@ -6,7 +6,7 @@
 Customer churn reduces revenue and increases acquisition costs. This project builds a reproducible, interpretable predictive model to identify customers most at risk of churning so that retention efforts can be prioritized where they have the greatest impact.
 
 ### Success Criteria
-The primary objectives are to identify at least 70% of actual churners (recall ≥ 0.7) while maintaining precision ≥ 0.5. I also track ROC-AUC to assess overall discriminative performance. Threshold selection centers on recall, with a 0.5 probability cutoff used for evaluation to meet business goals.
+The primary objectives are to identify at least 70% of actual churners (recall ≥ 0.7) while maintaining precision ≥ 0.5. I also track ROC-AUC and PR-AUC to assess overall discriminative performance. Threshold selection centers on recall: the operating cutoff was selected on pooled out-of-fold validation probabilities to maximize recall while maintaining precision ≥ 0.5 (final threshold ≈ 0.486). For benchmarking and comparability, results are also reported at a standard 0.50 cutoff.
 
 ### Stakeholders
 Executive leadership, customer service/retention operations, and marketing rely on churn insights to guide decisions, allocate resources, and design targeted interventions. Analytics and finance teams use model outputs to forecast risk and quantify ROI of retention programs.
@@ -17,10 +17,11 @@ I begin with a baseline majority-class benchmark, then implement logistic regres
 Data source: the analysis uses the Telco Customer Churn dataset (Kaggle). 
 
 Limitations: optimizing for recall at a 0.5 probability threshold lowers precision; class imbalance is handled via class weights rather than sampling.
+Limitations: optimizing for recall at a relatively low operating threshold can lower precision; class imbalance is handled via class weights rather than sampling.
 
 ### Key Results
 
-To meet business objectives, a 0.5 probability threshold was selected. The final model achieved recall 0.81, precision 0.53, and ROC-AUC 0.77, surpassing the recall target and meeting the precision benchmark. 
+At a standard 0.50 cutoff (used for benchmarking), the final model achieved recall 0.81, precision 0.53, and ROC-AUC 0.77, surpassing the recall target and meeting the precision benchmark. The operational cutoff was selected separately via pooled out-of-fold validation to maximize recall subject to precision ≥ 0.5 (final threshold ≈ 0.486).
 
 Retention signals include longer contracts (1-year, 2-year), higher tenure (7–12, 13–24, 25–48, 48+ months), and the Online Security add-on. 
 
@@ -106,7 +107,7 @@ In the exploratory data analysis I found that
 - Recall: 0.809 / 0.797
 - Precision: 0.529 / 0.492
 - ROC-AUC: 0.847 / 0.835
-- Classification threshold: 0.5 (selected to meet recall ≥ 0.7 and precision ≥ 0.5 objectives)
+- Classification threshold: ≈ 0.486 (operating; selected on pooled out-of-fold validation to maximize recall subject to precision ≥ 0.5); 0.50 (benchmarking)
 
 ### Confusion Matrix (Percent of instances)
 - Validation: TN 73.9, FP 26.1, FN 18.26, TP 81.74
@@ -114,7 +115,8 @@ In the exploratory data analysis I found that
 
 ### Threshold Selection Rationale (LogReg – All Add-Ons)
 - 0.45 → Recall 0.84, Precision 0.51, ROC-AUC 0.77 (higher recall, slightly lower precision)
-- 0.50 → Recall 0.81, Precision 0.53, ROC-AUC 0.77 (chosen: balances business targets)
+- 0.486 → Recall 0.817, Precision 0.520 (OOF-selected operating threshold: maximizes recall subject to precision ≥ 0.5; applied once to the holdout test set)
+- 0.50 → Recall 0.81, Precision 0.53, ROC-AUC 0.77 (benchmark cutoff used for comparability)
 - 0.55 → Recall 0.76, Precision 0.55, ROC-AUC 0.77 (precision improves, recall drops)
 - 0.60 → Recall 0.71, Precision 0.57, ROC-AUC 0.76 (highest precision among listed, recall below target)
 
@@ -135,7 +137,7 @@ Top coefficients (directional effects):
 ---
 
 ## 6. Discussion
-The model was optimized for higher recall to capture at-risk customers, which necessarily lowers precision at the chosen 0.5 threshold. Operationally, this means retention teams will engage more customers, increasing intervention costs, but with greater potential lift in prevented churn. A cost–benefit review should benchmark the per-contact cost against expected retention uplift to calibrate threshold selection and targeting rules.
+The model was optimized for higher recall to capture at-risk customers, which necessarily lowers precision at the chosen operating threshold. Operationally, this means retention teams will engage more customers, increasing intervention costs, but with greater potential lift in prevented churn. A cost–benefit review should benchmark the per-contact cost against expected retention uplift to calibrate threshold selection and targeting rules.
 
 - Insights: What factors are most related to churn?
 - Trade-offs between recall, precision, and business use case
