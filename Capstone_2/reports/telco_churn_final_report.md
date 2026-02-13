@@ -6,34 +6,18 @@
 Customer churn reduces revenue and increases acquisition costs. This project builds a reproducible, interpretable predictive model to identify customers most at risk of churning so that retention efforts can be prioritized where they have the greatest impact.
 
 ### Success Criteria
-The primary objectives are to identify at least 70% of actual churners (recall ≥ 0.7) while maintaining precision ≥ 0.5. I also track ROC-AUC and PR-AUC to assess overall discriminative performance. Threshold selection centers on recall: the operating cutoff was selected on pooled out-of-fold validation probabilities to maximize recall while maintaining precision ≥ 0.5 (final threshold ≈ 0.486). For benchmarking and comparability, results are also reported at a standard 0.50 cutoff.
+The primary objectives are to identify at least 70% of actual churners (recall ≥ 0.7) while maintaining precision ≥ 0.5. I also track ROC-AUC and PR-AUC to assess overall discriminative performance. Threshold selection centers on recall: the operating cutoff was selected on pooled out-of-fold validation probabilities to maximize recall while maintaining precision ≥ 0.5 (final threshold ≈ 0.486).
 
 ### Stakeholders
-Executive leadership, customer service/retention operations, and marketing rely on churn insights to guide decisions, allocate resources, and design targeted interventions. Analytics and finance teams use model outputs to forecast risk and quantify ROI of retention programs.
-
-### Approach
-I begin with a baseline majority-class benchmark, then implement logistic regression for interpretability, followed by advanced models to enhance performance. Class imbalance is addressed using model class weights; evaluation focuses on recall and ROC-AUC. All work is executed in modular, reproducible Jupyter notebooks, using only features defined in the project’s column manifest, with outputs and figures saved for transparency.
-
-Data source: the analysis uses the Telco Customer Churn dataset (Kaggle). 
-
-Limitations: optimizing for recall at a 0.5 probability threshold lowers precision; class imbalance is handled via class weights rather than sampling.
-Limitations: optimizing for recall at a relatively low operating threshold can lower precision; class imbalance is handled via class weights rather than sampling.
-
-### Key Results
-
-At a standard 0.50 cutoff (used for benchmarking), the final model achieved recall 0.81, precision 0.53, and ROC-AUC 0.77, surpassing the recall target and meeting the precision benchmark. The operational cutoff was selected separately via pooled out-of-fold validation to maximize recall subject to precision ≥ 0.5 (final threshold ≈ 0.486).
-
-Retention signals include longer contracts (1-year, 2-year), higher tenure (7–12, 13–24, 25–48, 48+ months), and the Online Security add-on. 
-
-Churn signals include fiber optic internet service, electronic payment method, and multiple phone lines.
-
-### Recommendations
-
-I recommend incentives for longer contracts, reliability improvements for fiber customers, tailored bundles for multi-line accounts, and targeted offers for electronic payment users.
+The model’s outputs are intended to support decision-making across:
+- Executive leadership (strategy and forecasting)
+- Customer retention operations (risk-based targeting)
+- Marketing (segmentation and outreach design)
+- Finance/analytics (ROI evaluation and budgeting)
 
 ---
 
-## 2. Data Description
+## 2. Data
 
 This analysis uses the **Telco Customer Churn** dataset from Kaggle, which contains **7,043 customer records and 21 original features**. Each record represents a single customer account.
 
@@ -49,12 +33,11 @@ The target variable is **Churn**, a binary indicator (Yes/No) identifying custom
 The dataset contains no explicit date fields. Account tenure serves as the sole temporal indicator, limiting the analysis to a cross-sectional view rather than a time-series framework. The target variable is moderately imbalanced, with an overall churn rate of **26.6%**, which informed subsequent evaluation metric selection.
 
 Column roles and data types are governed by a predefined manifest (telco_column_role_manifest.csv). Detailed variable definitions are provided in the raw (telco_raw_data_dictionary.csv) and cleaned (telco_wrangling_cleaned_data_dict.csv) data dictionaries for transparency and reproducibility.
-
 ---
 
-## 4. Methods
+## 3. Methods
 
-### 4.1 Data Wrangling 
+### 3.1 Data Wrangling 
 
 Initial data audits were conducted to assess structure, completeness, and consistency across all variables. This included review of summary statistics, missingness patterns, categorical value domains, and duplicate records.
 
@@ -89,21 +72,138 @@ The final analytical dataset contains **7,032 customer records and 27 features**
 The cleaned dataset and accompanying data dictionary were saved to support reproducibility and downstream analysis (`telco_wrangling_cleaned.csv` and `telco_wrangling_cleaned_data_dict.csv`).
 
 
-### 4.2 Exploratory Data Analysis
-- Distribution of churn vs non-churn
-In the exploratory data analysis I found that 
-- Notable trends and relationships
-- Key potential drivers of churn
+### 3.2 Exploratory Data Analysis
+#### Target Variable
 
-### 4.3 Modeling
-- Baseline model (logistic regression)
-- Advanced model(s) (e.g., Gradient Boosting)
-- Preprocessing pipeline summary (encoding, scaling, class imbalance handling)
+The churn rate is **26.6%**, indicating moderate class imbalance. This informed subsequent metric selection and threshold design.
 
 ---
 
-## 5. Results
-### Metrics (Validation / Test)
+#### Univariate Patterns
+
+Key distributions include:
+
+- **Tenure:** Right-skewed, with many customers in early tenure stages.
+- **MonthlyCharges:** Moderately right-skewed.
+- **TotalCharges:** Strongly right-skewed, reflecting cumulative billing.
+- **Contract type:** Month-to-month contracts are most common, while long-term contracts concentrate among customers with 49+ months of tenure.
+
+These patterns suggest meaningful behavioral segmentation by contract length and tenure.
+
+---
+
+#### Bivariate Relationships with Churn
+
+Effect size analysis identified:
+
+- **Strongest numeric predictor:** `tenure` (Cohen’s d = -0.857), indicating substantially lower churn among long-tenure customers.
+- **Strongest categorical predictor:** `Contract` (Cramér’s V = 0.410), reflecting materially different churn rates across contract types.
+
+Among numeric variables, tenure was the only predictor demonstrating a large effect size. Most categorical variables showed weak to moderate associations.
+
+Several predictors exhibited negligible association with churn (`gender`, `PhoneService`, `MultipleLines`, `has_streaming_eng`) and were evaluated for potential exclusion during feature simplification.
+
+---
+
+#### Multivariate Relationships & Collinearity
+
+Several strong correlations were observed:
+
+- **Tenure–TotalCharges:** r ≈ 0.83  
+- **MonthlyCharges–total_services_eng:** r ≈ 0.80  
+- **InternetService–MonthlyCharges:** η ≈ 0.906  
+
+These relationships indicate substantial redundancy among billing and service features.
+
+An interaction between short tenure and month-to-month contracts revealed a particularly high-risk segment: customers with short tenure on month-to-month contracts exhibit a churn rate of **51%**, nearly twice the overall churn rate (26.6%).
+
+No evidence of target leakage or proxy variables was identified.
+
+---
+
+#### Feature Simplification Strategy
+
+Based on collinearity analysis and effect size screening, redundant billing variables, negligible predictors, and highly correlated composite indicators were removed in alternative feature specifications.
+
+Created three alternative ('pruned') feature sets from the remaining variables with the following variations to reduce redundancy and collinearity:
+
+- "Monthly Charges": Included binned monthly charges  (`monthly_charges_binned`) and representative add-on service (`Online Security`). Excluded `InternetService` and all other add-ons because `InternetService` was highly correlated with 'monthly_charges_binned' and the internet add-ons are all highly correlated with `InternetService` and each other.
+- "Internet Service": Included `InternetService` and excluded monthly charges and all add-ons, to address collinearity issues described above.
+- "All Add-Ons": Included monthly charges plus all add-ons and excluded `InternetService`. The goal was to minimize some collinearity while trying to capture any add-ons of particular value.
+
+Cross-validated model comparisons were used to ensure simplification did not degrade performance relative to project targets (recall ≥ 0.70, precision ≥ 0.50, ROC-AUC > 0.75).
+
+---
+
+#### Modeling Implications
+
+Given the predominance of low-cardinality categorical predictors, logistic regression provides a strong, interpretable baseline. Gradient-boosted tree-based models (i.e., LightGBM) were evaluated to capture potential nonlinearities and interaction effects.
+
+Cross-validation was used to assess stability and confirm that feature pruning maintained performance at the defined operating threshold.
+
+When performance differences were negligible under cross-validation, the simpler model was preferred to improve interpretability and reduce the risk of multicollinearity.
+
+---
+
+### 3.3 Modeling Approach
+
+Model development followed a structured progression:
+
+1. **Baseline benchmark** using a stratified baseline classifier to establish a minimum performance reference.
+2. **Logistic regression** to provide interpretability and establish a transparent, explainable baseline.
+3. **Advanced models** (e.g., gradient boosting) to improve predictive performance.
+
+Class imbalance was addressed using model-based class weighting rather than resampling.
+
+Evaluation was conducted using both threshold-independent metrics (**ROC-AUC**, **Average Precision**) and business-aligned operating criteria (recall maximized subject to a precision constraint). Operating thresholds were selected using cross-validated out-of-fold predictions to reduce optimistic bias. Model selection was based on cross-validation performance, with final validation performed on a held-out test set.
+
+All analysis was conducted in modular, reproducible Jupyter notebooks using only features defined in the project column manifest. Outputs, tables, and figures were saved to support transparency and reproducibility.
+
+---
+#### Feature Set Evaluation
+
+To assess the impact of redundancy and multicollinearity on model performance and interpretability, four feature configurations were evaluated.  
+
+1. **All Features:** Full set of engineered and original predictors.
+2. **Monthly Charges:** Includes binned monthly charges and retains a representative add-on (`OnlineSecurity`).
+3. **Internet-Service Simplified Set:** Retains InternetService while removing correlated monthly charges and add-on features.
+4. **Add-On Services:** Keeps monthly charges and all add-on services and drops correlated InternetService.
+
+These configurations were designed to test whether simpler, more interpretable representations could maintain predictive performance relative to the full feature set.
+
+Each feature set was evaluated using Logistic Regression and LightGBM models under identical cross-validation procedures. The stratified dummy baseline was evaluated only on the full feature set.
+
+In total, nine models were trained and compared.
+
+
+## 4. Results
+
+### Validation / Test Metrics
+
+#### Stratified Baseline Classifier
+
+As shown below, the stratified baseline classifier performed as expected: recall, precision, and PR-AUC (average precision) are close to the overall churn rate (0.266). The ROC-AUC is 0.5074, no better than chance at discriminating churners vs non-churners.
+
+- Recall: 0.2781
+- Precision: 0.2766
+- ROC-AUC: 0.5074
+- PR-AUC (Average Precision): 0.2688
+
+
+
+|   Recall (OOF @ thr) |   Precision (OOF @ thr) |   ROC-AUC (OOF) |   PR-AUC/AP (OOF) |   Threshold |
+|---------------------:|------------------------:|----------------:|------------------:|------------:|
+|               0.8241 |                  0.5087 |          0.8466 |            0.6565 |      0.5000 |
+|               0.8174 |                  0.5002 |          0.8337 |            0.6174 |      0.5000 |
+|               0.8147 |                  0.4957 |          0.8354 |            0.6202 |      0.5000 |
+|               0.8120 |                  0.4992 |          0.8361 |            0.6289 |      0.5000 |
+|               0.8033 |                  0.5254 |          0.8463 |            0.6500 |      0.5000 |
+|               0.8020 |                  0.5250 |          0.8487 |            0.6627 |      0.5000 |
+|               0.8020 |                  0.5159 |          0.8417 |            0.6349 |      0.5000 |
+|               0.7973 |                  0.5203 |          0.8432 |            0.6390 |      0.5000 |
+
+
+
 - Recall: 0.809 / 0.797
 - Precision: 0.529 / 0.492
 - ROC-AUC: 0.847 / 0.835
@@ -136,7 +236,7 @@ Top coefficients (directional effects):
 
 ---
 
-## 6. Discussion
+## 5. Discussion
 The model was optimized for higher recall to capture at-risk customers, which necessarily lowers precision at the chosen operating threshold. Operationally, this means retention teams will engage more customers, increasing intervention costs, but with greater potential lift in prevented churn. A cost–benefit review should benchmark the per-contact cost against expected retention uplift to calibrate threshold selection and targeting rules.
 
 - Insights: What factors are most related to churn?
@@ -144,9 +244,15 @@ The model was optimized for higher recall to capture at-risk customers, which ne
 - Risks, limitations, and data caveats
 - Potential next steps (e.g., additional data, operationalization, A/B testing)
 
+### Limitations
+
+- Optimizing for recall at a relatively low operating threshold increases false positives, reducing precision.
+- Class imbalance was handled via class weights rather than sampling; alternative strategies (e.g., SMOTE or cost-sensitive learning) were not explored.
+- Results are based on a single public dataset and may not generalize to other industries or customer populations.
+
 ---
 
-## 7. Recommendations
+## 6. Recommendations
 - Concrete retention strategies based on model outputs
 - Suggested monitoring and evaluation process if deployed
 - Communication plan for stakeholders (executives vs technical teams)
@@ -160,9 +266,13 @@ The model indicates several actionable strategies to reduce customer churn:
 
 By tailoring retention strategies to these key segments, the company can more effectively address the drivers of churn and improve overall customer loyalty.
 
+### Recommendations
+
+I recommend incentives for longer contracts, reliability improvements for fiber customers, tailored bundles for multi-line accounts, and targeted offers for electronic payment users.
+
 ---
 
-## 8. Appendices
+## 7. Appendices
 - Data dictionary (processed dataset)
 - Full metrics table (baseline vs advanced models)
 - Hyperparameter search notes
