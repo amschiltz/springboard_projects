@@ -1,12 +1,12 @@
 Metric,Train (OOF),Test
 Recall,0.8167,0.8155
 Precision,0.5202,0.4864
+ROC-AUC,0.8463,0.8342
+Average Precision,0.65,0.6273
 True Positive Rate (TPR),0.8167,0.8155
 True Negative Rate (TNR),0.7274,0.6883
 False Positive Rate (FPR),0.2726,0.3117
 False Negative Rate (FNR),0.1833,0.1845
-ROC-AUC,0.8463,0.8342
-PR-AUC (AP),0.65,0.6273
 TN,3004.0,711.0
 FP,1126.0,322.0
 FN,274.0,69.0
