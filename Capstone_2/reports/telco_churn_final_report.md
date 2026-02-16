@@ -151,7 +151,7 @@ Model development followed a structured progression:
 
 1. **Baseline benchmark** using a stratified baseline classifier to establish a minimum performance reference.
 2. **Logistic regression** to provide interpretability and establish a transparent, explainable baseline.
-3. **Advanced models** (i.e., gradient boosting) to improve predictive performance.
+3. **Advanced models** (i.e., tree-based gradient boosting with LightGBM) to improve predictive performance.
 
 Class imbalance was addressed using model-based class weighting rather than resampling.
 
@@ -275,58 +275,182 @@ As a secondary advantage, logistic regression is simpler and more interpretable,
 
 Overall, Logistic Regression: All Add-Ons meets the precision requirement and provides the best churn capture under the chosen operating constraint, making it the most appropriate final model for this use case.
 
+In practice, the optimal model choice may depend on additional business factors, such as the relative costs of customer churn versus retention offers, which are not specified here.
+
+### 4.5 Final Model Test Performance
+*(Logistic Regression — All Add-Ons Feature Set)*
+
+The final Logistic Regression model was retrained on the full training dataset using the optimal hyperparameters identified during cross-validation (C = 10, penalty = L1, solver = liblinear, class_weight = balanced, max_iter = 1000, random_state = 42).
+
+Predicted probabilities were then generated on the held-out test set, and the pre-selected operating threshold (0.4856), determined from pooled out-of-fold validation, was applied to obtain final classifications.
+
+Test performance closely mirrors pooled out-of-fold (OOF) validation estimates, indicating minimal overfitting. Recall remains stable (0.817 OOF vs. 0.816 test), and ROC-AUC declines only modestly (0.846 → 0.834), suggesting good generalization to unseen data.
+
+**Table 4. Final Model Performance (OOF vs Test)**
+| Metric         | Train (OOF) | Test   |
+| -------------- | ----------- | ------ |
+| Recall         | 0.8167      | 0.8155 |
+| Precision      | 0.5200      | 0.4864 |
+| ROC-AUC        | 0.8463      | 0.8342 |
+| Average Precision | 0.6500      | 0.6273 |
 
 
-
-
-### Business Interpretation of Feature Importances
-- Retention factors: longer contract terms (1-year, 2-year) and higher tenure (7+ months) are associated with lower churn; the Online Security add-on shows the strongest retention effect among add-ons, likely by addressing data protection and safety concerns.
-- Churn factors: fiber optic internet service, electronic payment method, and multiple phone lines are the strongest predictors of churn, representing distinct segments that warrant targeted retention strategies.
-
-Top coefficients (directional effects):
-- Negative (retention): Two-year contract, Tenure 49+, Tenure 25–48, Tenure 13–24, One-year contract, Tenure 7–12, Online Security, Tech Support, Dependents
-- Positive (churn risk): Fiber Optic internet, Electronic payment, Multiple lines, Streaming TV/Movies, Paperless billing, Senior citizen
-
-### Visualizations
-- ROC curve and feature importance plots
-
----
-
-## 5. Discussion
-The model was optimized for higher recall to capture at-risk customers, which necessarily lowers precision at the chosen operating threshold. Operationally, this means retention teams will engage more customers, increasing intervention costs, but with greater potential lift in prevented churn. A cost–benefit review should benchmark the per-contact cost against expected retention uplift to calibrate threshold selection and targeting rules.
-
-- Insights: What factors are most related to churn?
-- Trade-offs between recall, precision, and business use case
-- Risks, limitations, and data caveats
-- Potential next steps (e.g., additional data, operationalization, A/B testing)
-
-### Limitations
-
-- Optimizing for recall at a relatively low operating threshold increases false positives, reducing precision.
-- Class imbalance was handled via class weights rather than sampling; alternative strategies (e.g., SMOTE or cost-sensitive learning) were not explored.
-- Results are based on a single public dataset and may not generalize to other industries or customer populations.
+Precision on the test set (0.4864) is slightly below the 0.50 target. This modest decline reflects normal sampling variability and the sensitivity of precision to threshold calibration. Importantly, recall remains stable, preserving the primary objective of high churn capture.
 
 ---
 
-## 6. Recommendations
-- Concrete retention strategies based on model outputs
-- Suggested monitoring and evaluation process if deployed
-- Communication plan for stakeholders (executives vs technical teams)
+**Confusion Matrix (Test Set, threshold = 0.4856)**
 
-The model indicates several actionable strategies to reduce customer churn:
+Table 5. Confusion Matrix (Counts)
+|            | Predicted No | Predicted Yes |
+| ---------- | ------------ | ------------- |
+| Actual No  | 711          | 322           |
+| Actual Yes | 69           | 305           |
 
-- Incentivize longer contracts and reward customers for extended tenure, as these factors are associated with higher retention.
-- For fiber optic internet customers—who often have higher expectations for speed and reliability—investigate and address any service quality issues. Proactively improving reliability and communicating enhancements can help retain this segment.
-- Customers with multiple phone lines, such as families or businesses, are typically more sensitive to costs and service quality. Offer cost-effective bundles and regularly benchmark against competitors to ensure your offerings remain attractive.
-- For customers who use electronic payment methods, consider targeted retention efforts. This segment may be more likely to churn due to the ease of switching providers. Implement loyalty programs, personalized offers, or exclusive benefits for electronic payment users to increase engagement and reduce churn risk. Additionally, monitor for any friction in the electronic payment process and ensure it is seamless and secure.
 
-By tailoring retention strategies to these key segments, the company can more effectively address the drivers of churn and improve overall customer loyalty.
+Table 6. Row-Normalized Confusion Matrix (%) <sup>*</sup>
+|            | Predicted No | Predicted Yes |
+| ---------- | ------------ | ------------- |
+| Actual No  | 68.83%       | 31.17%        |
+| Actual Yes | 18.45%       | 81.55%        |
 
-### Recommendations
+<sup>*</sup> **Percentages are normalized by true class.**
 
-I recommend incentives for longer contracts, reliability improvements for fiber customers, tailored bundles for multi-line accounts, and targeted offers for electronic payment users.
+On the held-out test set:
+
+305 of 374 churners (81.6%) were correctly identified.
+69 churners (18.5%) were missed.
+322 retained customers (31.2%) were incorrectly flagged for outreach.
+
+Operationally, this means the model successfully identifies approximately four out of five churners, while roughly one-third of retained customers would receive unnecessary retention contact. This trade-off is consistent with the project objective of prioritizing churn capture while maintaining acceptable precision.
+
+Overall, the final Logistic Regression model demonstrates stable generalization and meets the primary objective of high churn recall with controlled precision. Performance consistency between validation and test sets supports its suitability for deployment, subject to ongoing monitoring and periodic recalibration.
 
 ---
+
+### 4.6 Final Model Predictors of Churn
+
+Logistic regression coefficients represent changes in log-odds of churn relative to each feature’s reference category (using one-hot encoding with `drop='first'`). For interpretability, coefficients are converted to odds ratios (exp(β)) and percent change in odds. These effects describe statistical associations and should not be interpreted causally.
+
+- Odds ratio **< 1** → lower churn odds (retention-associated)
+- Odds ratio **> 1** → higher churn odds (churn-associated)
+
+Table 7 shows the ten predictors with the largest absolute coefficients.
+ 
+Table 7. Top 10 Predictors of Churn 
+*Predictors are ranked by absolute coefficient magnitude.*
+
+| Feature                           |   Coefficient |   Odds Ratio |   % Change in Churn Odds |
+|:----------------------------------|--------------:|-------------:|-------------------------:|
+| Contract (2-year)                 |         -1.83 |         0.16 |                   -83.98 |
+| Tenure Group (49+ months)         |         -1.72 |         0.18 |                   -82.14 |
+| Tenure Group (25-48 months)       |         -1.51 |         0.22 |                   -77.99 |
+| Tenure Group (13-24 months)       |         -1.16 |         0.31 |                   -68.57 |
+| Streaming TV (No internet)        |         -0.91 |         0.4  |                   -59.62 |
+| Internet Service (Fiber Optic)    |          0.89 |         2.43 |                   142.82 |
+| Contract (1-year)                 |         -0.89 |         0.41 |                   -58.74 |
+| Tenure Group (7-12 months)        |         -0.79 |         0.45 |                   -54.83 |
+| Payment Method (Electronic-Check) |          0.41 |         1.5  |                    50.03 |
+| Monthly Charges Low (≤ $35)       |          0.39 |         1.48 |                    48.37 |
+
+Across the top coefficients, most large-magnitude effects are negative, indicating that customer stability factors (contract length, tenure) dominate model signal — while churn risk concentrates in smaller, higher-risk segments.
+
+#### Retention-Associated Factors
+
+**Contract Length**
+
+Customers on **1-year** and especially **2-year contracts** exhibit substantially lower churn odds relative to the reference category (month-to-month).
+
+- Two-year contracts reduce churn odds by approximately **84%**.
+- One-year contracts reduce churn odds by approximately **59%**.
+
+Longer contractual commitments likely reflect both switching barriers and greater customer stability.
+
+**Tenure**
+
+All non-reference tenure bins (7–12, 13–24, 25–48, 49+ months) are associated with lower churn odds relative to new customers (0–6 months).
+
+- Customers with 49+ months tenure have approximately **82% lower churn odds**.
+- Even moderate tenure (13–24 months) reduces churn odds by nearly **69%**.
+
+This pattern reflects a common lifecycle pattern: churn risk is highest early in the customer relationship.
+
+**No Internet Service Segment**
+
+The variable "Streaming TV (No internet service)" appears among the strongest negative coefficients. This does not indicate a protective effect of streaming behavior. Rather, it functions as an indicator for customers without internet service.
+
+Because “No internet service” is encoded across all internet-dependent add-ons, this coefficient effectively captures customers whose InternetService = No relative to those with internet access in the baseline add-on category.
+
+#### Churn-Associated Factors
+
+**Internet Service = Fiber Optic**
+
+Compared to DSL (reference), fiber optic customers have 143% higher churn odds. This may reflect competitive fiber markets, pricing sensitivity, or higher service expectations.
+
+**Payment Method = Electronic Check**
+
+Relative to automatic bank transfer (reference), electronic check users exhibit **50% higher churn odds**. This may reflect differences in customer segment characteristics or lower autopay adoption, potentially indicating weaker commitment or billing friction.
+
+**Monthly Charges = Low (≤ $35)**
+
+Relative to high monthly charges (> $70), low monthly charges are associated with **48% higher churn odds**. This may indicate lower engagement or greater price sensitivity.
+
+#### Summary
+
+Overall, the model identifies two broad patterns:
+
+1. **Customer stability variables** (contract length, tenure) strongly reduce churn risk.
+2. **Specific customer subgroups** (fiber internet, electronic payment, low engagement tiers) elevate churn risk.
+
+These predictors are most valuable for segmentation and targeted retention strategy design (e.g., proactive outreach to fiber + electronic check customers). While not causal, they provide actionable insight into which customer groups warrant prioritization.
+---
+
+## 5. Limitations
+
+Several limitations should be considered when interpreting these results:
+
+**Threshold Trade-Off:** Optimizing for high recall at a relatively low operating threshold increases false positives, reducing precision. If deployed, this would increase outreach volume and associated costs.
+
+**Class Imbalance Strategy:** Class imbalance was addressed using model-based class weights rather than sampling or cost-sensitive optimization. Alternative approaches (e.g., SMOTE, calibrated cost functions, or profit-based optimization) were not explored.
+
+**Cross-Sectional Design:** The dataset does not contain explicit temporal features beyond tenure, limiting analysis to a cross-sectional view rather than true time-to-event modeling.
+
+**Single Dataset:** Results are based on a single public dataset and may not generalize to other industries, pricing structures, or competitive environments.
+
+**Predictive Model:** Coefficients reflect statistical associations rather than causal relationships. Interventions based on these findings should be validated through controlled experimentation (e.g., A/B testing).
+
+---
+
+## 6. Discussion
+
+The final model was optimized to maximize recall subject to a minimum precision requirement. As expected, prioritizing recall increases the false positive rate, meaning retention teams would engage a larger pool of customers — including some who would not have churned.
+
+Operationally, this creates a classic cost–benefit trade-off. Higher recall increases the likelihood of preventing churn but raises intervention costs. Organizations should evaluate:
+
+- Per-contact outreach cost
+- Expected retention uplift
+- Customer lifetime value
+
+These inputs can inform recalibration of the operating threshold to align model deployment with business objectives.
+
+Importantly, model performance remained stable between cross-validation and test sets, indicating reliable generalization. However, if deployed in production, periodic monitoring and recalibration would be necessary to address potential drift in customer behavior or market conditions.
+
+## 7. Recommendations
+
+The model identifies several actionable opportunities for targeted retention strategies:
+
+- **Move Customers to Longer Contracts:** Longer contract terms are strongly associated with lower churn. Offer structured incentives or loyalty discounts to encourage customers to switch to longer-term agreements.
+
+- **Prioritize Fiber Optic Customers:** Fiber optic customers exhibit substantially higher churn odds. Audit service quality, address reliability issues, and clearly communicate improvements. Consider loyalty incentives for high-bandwidth users.
+
+- **Promote Automatic Payments::** Customers paying via electronic check have elevated churn risk. Encourage enrollment in autopay through discounts or convenience incentives, and ensure billing processes are frictionless and reliable.
+
+- **Use Low-Cost Outreach for Lower-Billing Customers:** Customers in the lowest billing tier exhibit higher churn odds, which may reflect greater price sensitivity or lower perceived value. This segment probably generates lower revenue per user so retention efforts should be scaled accordingly. Use low-cost digital outreach (e.g., email or in-app messaging) and test value-focused bundles or incremental add-ons that increase perceived benefit without substantially raising monthly cost.
+
+- **Monitor Stable No-Internet Customers:** Customers without internet service have substantially lower churn odds. This segment may require less intensive retention efforts compared to higher-risk groups, but should still be monitored to ensure stability over time.
+
+By focusing retention efforts on these identifiable high-risk segments, the organization can allocate resources more efficiently and improve overall customer lifetime value.
+
 
 ## 7. Appendices
 - Data dictionary (processed dataset)

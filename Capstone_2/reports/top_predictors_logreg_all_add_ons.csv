@@ -1,29 +1,29 @@
-Feature,Coefficient,Coefficient (Abs Value),Odds Ratio,% Change in Odds
-Contract_Two_year,-1.83,1.83,0.16,-83.98
-Tenure Group (49+ months),-1.72,1.72,0.18,-82.14
-Tenure Group (25-48 months),-1.51,1.51,0.22,-77.99
-Tenure Group (13-24 months),-1.16,1.16,0.31,-68.57
-Streaming TV (No internet),-0.91,0.91,0.4,-59.62
-Internet Service (Fiber Optic),0.89,0.89,2.43,142.82
-Contract 1-year (Yes),-0.89,0.89,0.41,-58.74
-Tenure Group (7-12 months),-0.79,0.79,0.45,-54.83
-Payment Method Electronic (Yes),0.41,0.41,1.5,50.03
-Monthly Charges Low (≤ $35),0.39,0.39,1.48,48.37
-Online Security (Yes),-0.37,0.37,0.69,-30.73
-Streaming TV (Yes),0.35,0.35,1.42,42.36
-Streaming Movies (Yes),0.35,0.35,1.42,42.04
-Tech Support (Yes),-0.32,0.32,0.73,-27.27
-PaperlessBilling_Yes,0.27,0.27,1.31,30.69
-SeniorCitizen_Yes,0.22,0.22,1.25,24.7
-Dependents_Yes,-0.21,0.21,0.81,-19.1
-StreamingMovies_No_internet_service,-0.16,0.16,0.85,-14.64
-Online Backup (Yes),-0.16,0.16,0.85,-15.16
-OnlineSecurity_No_internet_service,-0.16,0.16,0.85,-14.74
-PaymentMethod_Credit_card_(automatic),0.08,0.08,1.08,7.92
-Device Protection (Yes),0.06,0.06,1.06,6.24
-TechSupport_No_internet_service,-0.05,0.05,0.95,-5.1
-Partner_Yes,-0.03,0.03,0.97,-2.56
-PaymentMethod_Mailed_check,0.02,0.02,1.02,1.82
-monthly_charges_bin_eng_Medium,0.02,0.02,1.02,2.04
-DeviceProtection_No_internet_service,0.0,0.0,1.0,0.0
-OnlineBackup_No_internet_service,0.0,0.0,1.0,0.0
+Feature,Coefficient,Odds Ratio,% Change in Churn Odds
+Contract (2-year),-1.83,0.16,-83.98
+Tenure Group (49+ months),-1.72,0.18,-82.14
+Tenure Group (25-48 months),-1.51,0.22,-77.99
+Tenure Group (13-24 months),-1.16,0.31,-68.57
+Streaming TV (No internet),-0.91,0.4,-59.62
+Internet Service (Fiber Optic),0.89,2.43,142.82
+Contract (1-year),-0.89,0.41,-58.74
+Tenure Group (7-12 months),-0.79,0.45,-54.83
+Payment Method (Electronic-Check),0.41,1.5,50.03
+Monthly Charges Low (≤ $35),0.39,1.48,48.37
+Online Security (Yes),-0.37,0.69,-30.73
+Streaming TV (Yes),0.35,1.42,42.36
+Streaming Movies (Yes),0.35,1.42,42.04
+Tech Support (Yes),-0.32,0.73,-27.27
+PaperlessBilling_Yes,0.27,1.31,30.69
+SeniorCitizen_Yes,0.22,1.25,24.7
+Dependents_Yes,-0.21,0.81,-19.1
+StreamingMovies_No_internet_service,-0.16,0.85,-14.64
+Online Backup (Yes),-0.16,0.85,-15.16
+OnlineSecurity_No_internet_service,-0.16,0.85,-14.74
+PaymentMethod_Credit_card_(automatic),0.08,1.08,7.92
+Device Protection (Yes),0.06,1.06,6.24
+TechSupport_No_internet_service,-0.05,0.95,-5.1
+Partner_Yes,-0.03,0.97,-2.56
+PaymentMethod_Mailed_check,0.02,1.02,1.82
+monthly_charges_bin_eng_Medium,0.02,1.02,2.04
+DeviceProtection_No_internet_service,0.0,1.0,0.0
+OnlineBackup_No_internet_service,0.0,1.0,0.0
