@@ -1,4 +1,4 @@
-# EDA Summary Template — Telco Customer Churn
+# EDA Summary — Telco Customer Churn
 
 ## Dataset Overview
 - Rows: 7032
