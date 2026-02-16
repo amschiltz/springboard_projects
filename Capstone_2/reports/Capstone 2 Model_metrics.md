@@ -1,4 +1,4 @@
-# Final Model Metrics Summary
+# Final Model Metrics
 
 **Project:** Telco Customer Churn Prediction  
 **Author:** Allison Schiltz  
