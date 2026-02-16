@@ -159,7 +159,7 @@ Evaluation was conducted using both threshold-independent metrics (**ROC-AUC**, 
 
 All analysis was conducted in modular, reproducible Jupyter notebooks using only features defined in the project column manifest. Outputs, tables, and figures were saved to support transparency and reproducibility. 
 
-Note: Average Precision (AP) is a threshold-free precision–recall metric (scikit-learn average_precision_score). For a stratified baseline, AP equals the positive-class prevalence (≈0.266); higher AP indicates better ranking. 
+Note: **Average Precision (AP)** is a threshold-free precision–recall metric (scikit-learn average_precision_score). It is the area under the precision-recall curve. For a stratified baseline, AP equals the positive-class prevalence (≈0.266); higher AP indicates better ranking. 
 
 ---
 #### Feature Set Evaluation
@@ -284,7 +284,7 @@ The final Logistic Regression model was retrained on the full training dataset u
 
 Predicted probabilities were then generated on the held-out test set, and the pre-selected operating threshold (0.4856), determined from pooled out-of-fold validation, was applied to obtain final classifications.
 
-Test performance closely mirrors pooled out-of-fold (OOF) validation estimates, indicating minimal overfitting. Recall remains stable (0.817 OOF vs. 0.816 test), and ROC-AUC declines only modestly (0.846 → 0.834), suggesting good generalization to unseen data.
+Test performance closely mirrors pooled out-of-fold (OOF) validation estimates, indicating minimal overfitting. Recall remains stable (0.817 OOF vs. 0.816 test), and ROC-AUC declines only modestly (0.846 → 0.834), suggesting good generalization to unseen data  (Table 4).
 
 **Table 4. Final Model Performance (OOF vs Test)**
 | Metric         | Train (OOF) | Test   |
@@ -292,37 +292,58 @@ Test performance closely mirrors pooled out-of-fold (OOF) validation estimates, 
 | Recall         | 0.8167      | 0.8155 |
 | Precision      | 0.5200      | 0.4864 |
 | ROC-AUC        | 0.8463      | 0.8342 |
-| Average Precision | 0.6500      | 0.6273 |
+| AP             | 0.6500      | 0.6273 |
 
 
 Precision on the test set (0.4864) is slightly below the 0.50 target. This modest decline reflects normal sampling variability and the sensitivity of precision to threshold calibration. Importantly, recall remains stable, preserving the primary objective of high churn capture.
 
 ---
 
+**Discrimination Performance**
+
+Figure 1 shows the ROC curve for the final model on the test set.
+
+**Figure 1 — ROC Curve (Final Model, Test Set)**
+
+![alt text](figures/roc_curve_logreg_all_add_ons.png)
+
+The curve remains well above the diagonal chance line, consistent with the test ROC-AUC of 0.834. This indicates that the model effectively ranks customers by churn risk across classification thresholds.
+
+Because the business objective prioritizes recall while maintaining acceptable precision, the Precision–Recall curve provides a more operational view of performance.
+
+**Figure 2 — Precision–Recall Curve (Final Model, Test Set)**
+
+![alt text](figures/pr_curve_logreg_all_add_ons.png)
+
+The selected operating threshold (0.486) is highlighted on the curve. This point reflects the trade-off between churn capture and false positives and aligns with the defined precision constraint.
+
+---
+
 **Confusion Matrix (Test Set, threshold = 0.4856)**
 
-Table 5. Confusion Matrix (Counts)
+Tables 5 and 6 summarize classification outcomes on the test set.
+
+- 305 of 374 churners (81.6%) were correctly identified.
+- 69 churners (18.5%) were missed.
+- 322 retained customers (31.2%) were incorrectly flagged for outreach.
+
+This means the model correctly identifies approximately four out of five churners, while roughly one-third of retained customers would receive unnecessary retention contact. This trade-off is consistent with the project objective.
+
+**Table 5. Confusion Matrix (Counts)**
 |            | Predicted No | Predicted Yes |
 | ---------- | ------------ | ------------- |
 | Actual No  | 711          | 322           |
 | Actual Yes | 69           | 305           |
 
 
-Table 6. Row-Normalized Confusion Matrix (%) <sup>*</sup>
+**Table 6. Row-Normalized Confusion Matrix (%)** <sup>*</sup>
 |            | Predicted No | Predicted Yes |
 | ---------- | ------------ | ------------- |
 | Actual No  | 68.83%       | 31.17%        |
 | Actual Yes | 18.45%       | 81.55%        |
 
-<sup>*</sup> **Percentages are normalized by true class.**
+<sup>*</sup> *Percentages are normalized by true class.*
 
-On the held-out test set:
-
-305 of 374 churners (81.6%) were correctly identified.
-69 churners (18.5%) were missed.
-322 retained customers (31.2%) were incorrectly flagged for outreach.
-
-Operationally, this means the model successfully identifies approximately four out of five churners, while roughly one-third of retained customers would receive unnecessary retention contact. This trade-off is consistent with the project objective of prioritizing churn capture while maintaining acceptable precision.
 
 Overall, the final Logistic Regression model demonstrates stable generalization and meets the primary objective of high churn recall with controlled precision. Performance consistency between validation and test sets supports its suitability for deployment, subject to ongoing monitoring and periodic recalibration.
 
@@ -335,10 +356,11 @@ Logistic regression coefficients represent changes in log-odds of churn relative
 - Odds ratio **< 1** → lower churn odds (retention-associated)
 - Odds ratio **> 1** → higher churn odds (churn-associated)
 
-Table 7 shows the ten predictors with the largest absolute coefficients.
+Table 7 lists the ten predictors with the largest absolute coefficients.
  
-Table 7. Top 10 Predictors of Churn 
-*Predictors are ranked by absolute coefficient magnitude.*
+**Table 7. Top 10 Predictors of Churn**
+
+*Predictors ranked by largest absolute coefficient magnitude.*
 
 | Feature                           |   Coefficient |   Odds Ratio |   % Change in Churn Odds |
 |:----------------------------------|--------------:|-------------:|-------------------------:|
@@ -353,7 +375,19 @@ Table 7. Top 10 Predictors of Churn
 | Payment Method (Electronic-Check) |          0.41 |         1.5  |                    50.03 |
 | Monthly Charges Low (≤ $35)       |          0.39 |         1.48 |                    48.37 |
 
-Across the top coefficients, most large-magnitude effects are negative, indicating that customer stability factors (contract length, tenure) dominate model signal — while churn risk concentrates in smaller, higher-risk segments.
+---
+
+**Visualizing Predictor Strength**
+
+Figure 3 displays the same predictors on the log-odds scale to compare relative magnitude and direction.
+
+**Figure 3. Top Predictors Ranked by Coefficient Magnitude (Log-Odds Scale)**
+
+![alt text](figures/top_predictors_logreg_all_add_ons.png)
+
+Negative values indicate retention-associated factors (reduced churn likelihood), while positive bars indicate elevated churn risk.
+
+Across the strongest predictors, most large-magnitude effects are negative, indicating that customer stability factors (contract length and tenure) are the strongest predictors in the model, while elevated churn risk is concentrated in specific higher-risk segments.
 
 #### Retention-Associated Factors
 
@@ -450,12 +484,5 @@ The model identifies several actionable opportunities for targeted retention str
 - **Monitor Stable No-Internet Customers:** Customers without internet service have substantially lower churn odds. This segment may require less intensive retention efforts compared to higher-risk groups, but should still be monitored to ensure stability over time.
 
 By focusing retention efforts on these identifiable high-risk segments, the organization can allocate resources more efficiently and improve overall customer lifetime value.
-
-
-## 7. Appendices
-- Data dictionary (processed dataset)
-- Full metrics table (baseline vs advanced models)
-- Hyperparameter search notes
-- Links to code, notebooks, and figures
 
 ---
