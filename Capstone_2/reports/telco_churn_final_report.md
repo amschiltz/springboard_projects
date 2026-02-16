@@ -33,6 +33,7 @@ The target variable is **Churn**, a binary indicator (Yes/No) identifying custom
 The dataset contains no explicit date fields. Account tenure serves as the sole temporal indicator, limiting the analysis to a cross-sectional view rather than a time-series framework. The target variable is moderately imbalanced, with an overall churn rate of **26.6%**, which informed subsequent evaluation metric selection.
 
 Column roles and data types are governed by a predefined manifest (telco_column_role_manifest.csv). Detailed variable definitions are provided in the raw (telco_raw_data_dictionary.csv) and cleaned (telco_wrangling_cleaned_data_dict.csv) data dictionaries for transparency and reproducibility.
+
 ---
 
 ## 3. Methods
@@ -109,9 +110,9 @@ Several predictors exhibited negligible association with churn (`gender`, `Phone
 
 Several strong correlations were observed:
 
-- **Tenure–TotalCharges:** r ≈ 0.83  
-- **MonthlyCharges–total_services_eng:** r ≈ 0.80  
-- **InternetService–MonthlyCharges:** η ≈ 0.906  
+- **Tenure↔TotalCharges:** r ≈ 0.83  
+- **MonthlyCharges↔total_services_eng:** r ≈ 0.80  
+- **InternetService↔MonthlyCharges:** η ≈ 0.906  
 
 These relationships indicate substantial redundancy among billing and service features.
 
@@ -206,12 +207,12 @@ This establishes a meaningful lower bound for model performance.
 
 Using pooled out-of-fold (OOF) probabilities and a standard 0.50 threshold (Table 2), both Logistic Regression and LightGBM substantially outperformed the baseline.
 
-Across models:
+Across models at the 0.50 threshold, mean performance (with ranges) was:
 
-- **Recall:** Mean 0.809 (range: 0.797–0.827)
-- **Precision:** ≈ 0.51 (range: 0.498–0.525)
-- **ROC-AUC:** Mean 0.842 (range: 0.833–0.849)
-- **AP:** Mean 0.639 (range: 0.615–0.663)
+- **Recall:** 0.809 (0.797–0.827)
+- **Precision:** 0.510 (0.498–0.525)
+- **ROC-AUC:** 0.842 (0.833–0.849)
+- **AP:** 0.639 (0.615–0.663)
 
 LightGBM achieved slightly higher recall at the 0.50 threshold, while Logistic Regression achieved slightly higher precision in several configurations. Overall discrimination (ROC-AUC) was strong and consistent across models.
 
@@ -240,7 +241,7 @@ Under this constraint (Table 3):
 
 - Logistic Regression models achieved the highest recall while maintaining the precision requirement.
 
-- **The Logistic Regression: All Add-Ons** configuration achieved the strongest balance (Recall = 0.817, Precision = 0.520).
+- The **Logistic Regression: All Add-Ons** configuration achieved the strongest balance (Recall = 0.817, Precision = 0.520).
 
 - LightGBM models required higher thresholds to satisfy the precision constraint, resulting in modest recall reductions relative to their 0.50 performance.
 
@@ -437,21 +438,22 @@ Overall, the model identifies two broad patterns:
 2. **Specific customer subgroups** (fiber internet, electronic payment, low engagement tiers) elevate churn risk.
 
 These predictors are most valuable for segmentation and targeted retention strategy design (e.g., proactive outreach to fiber + electronic check customers). While not causal, they provide actionable insight into which customer groups warrant prioritization.
+
 ---
 
 ## 5. Limitations
 
 Several limitations should be considered when interpreting these results:
 
-**Threshold Trade-Off:** Optimizing for high recall at a relatively low operating threshold increases false positives, reducing precision. If deployed, this would increase outreach volume and associated costs.
+- **Threshold Trade-Off:** Optimizing for high recall at a relatively low operating threshold increases false positives, reducing precision. If deployed, this would increase outreach volume and associated costs.
 
-**Class Imbalance Strategy:** Class imbalance was addressed using model-based class weights rather than sampling or cost-sensitive optimization. Alternative approaches (e.g., SMOTE, calibrated cost functions, or profit-based optimization) were not explored.
+- **Class Imbalance Strategy:** Class imbalance was addressed using model-based class weights rather than sampling or cost-sensitive optimization. Alternative approaches (e.g., SMOTE, calibrated cost functions, or profit-based optimization) were not explored.
 
-**Cross-Sectional Design:** The dataset does not contain explicit temporal features beyond tenure, limiting analysis to a cross-sectional view rather than true time-to-event modeling.
+- **Cross-Sectional Design:** The dataset does not contain explicit temporal features beyond tenure, limiting analysis to a cross-sectional view rather than true time-to-event modeling.
 
-**Single Dataset:** Results are based on a single public dataset and may not generalize to other industries, pricing structures, or competitive environments.
+- **Single Dataset:** Results are based on a single public dataset and may not generalize to other industries, pricing structures, or competitive environments.
 
-**Predictive Model:** Coefficients reflect statistical associations rather than causal relationships. Interventions based on these findings should be validated through controlled experimentation (e.g., A/B testing).
+- **Predictive Model:** Coefficients reflect statistical associations rather than causal relationships. Interventions based on these findings should be validated through controlled experimentation (e.g., A/B testing).
 
 ---
 
